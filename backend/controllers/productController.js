@@ -1,9 +1,10 @@
 const Product = require("../models/productModels")
 const ErrorHandler = require("../utils/errorHandler")
+const catchAsyncErrors = require("../middleware/catchAsyncErrors")
 
 // ===========***** Create Product -- admin *****=============
 
-exports.createProduct = async (req,res,next)=>{
+exports.createProduct = catchAsyncErrors(async (req,res,next)=>{
     
     const product = await Product.create(req.body)
  
@@ -12,11 +13,11 @@ exports.createProduct = async (req,res,next)=>{
         product
     })
 
-}
+})
 
 // Get All Product
 
-exports.getAllProducts= async (req,res)=>{
+exports.getAllProducts= catchAsyncErrors(async (req,res)=>{
 
     const products = await Product.find()
 
@@ -25,11 +26,11 @@ exports.getAllProducts= async (req,res)=>{
         success:true,
         products
     })
-}
+})
 
 // get product details
 
-exports.getProductDetails = async (req,res,next)=>{
+exports.getProductDetails = catchAsyncErrors(async (req,res,next)=>{
     let product = await Product.findById(req.params.id)
     console.log(req.params.id);
     if(!product){
@@ -42,11 +43,11 @@ exports.getProductDetails = async (req,res,next)=>{
         product
     })
 
-}
+})
 
 // Update Product -- admin
 
-exports.updateProduct = async (req,res)=>{
+exports.updateProduct = catchAsyncErrors(async (req,res)=>{
     let product = await  Product.findById(req.params.id)
 
     if(!product){
@@ -64,11 +65,11 @@ exports.updateProduct = async (req,res)=>{
         status:true,
         product
     })
-}
+})
 
 // Delete Product
 
-exports.deleteProduct = async (req,res,next)=>{
+exports.deleteProduct = catchAsyncErrors(async (req,res,next)=>{
     const product = await Product.findById(req.params.id)
 
     if(!product){
@@ -81,4 +82,4 @@ exports.deleteProduct = async (req,res,next)=>{
         success:true,
         message:"Product delected successfully"
     })
-}
+})
