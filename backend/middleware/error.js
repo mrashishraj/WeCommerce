@@ -6,6 +6,7 @@ module.exports = (err,req,res,next)=>{
     err.statusCode = err.statusCode || 500;
     err.message = err.message
 
+    console.log(err.module)
     // wrong mongodb id error
     if(err.name === "CastError"){
         const message = `Resource not found. Invalid: ${err.path}`
