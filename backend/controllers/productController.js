@@ -6,7 +6,8 @@ const ApiFeatures = require("../utils/apiFeatures")
 // ===========***** Create Product -- admin *****=============
 
 exports.createProduct = catchAsyncErrors(async (req,res,next)=>{
-    
+    req.body.user = req.user.id
+
     const product = await Product.create(req.body)
  
     res.status(201).json({
@@ -34,7 +35,7 @@ exports.getAllProducts= catchAsyncErrors(async (req,res)=>{
     })
 })
 
-// get product details
+// Get Product Details
 
 exports.getProductDetails = catchAsyncErrors(async (req,res,next)=>{
     let product = await Product.findById(req.params.id)
