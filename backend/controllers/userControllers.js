@@ -4,6 +4,8 @@ const ErrorHandler = require("../utils/errorHandler")
 const sendToken = require("../utils/jwtToken")
 const sendEmail = require("../utils/sendEmail")
 const crypto = require("crypto")
+const Product = require("../models/productModels")
+const { query } = require("express")
 
 exports.registerUser = catchAsyncErrors(async (req, res, next)=>{
     const {name, email, password} = req.body
@@ -163,7 +165,7 @@ exports.userPasswordChange = catchAsyncErrors(async (req,res,next)=>{
     })
 }) 
 
-// Update user profile
+// Update user profile 
 exports.userProfileUpdate = catchAsyncErrors(async (req,res,next)=>{
     const newUserData = {
         name:req.body.name,
@@ -181,5 +183,165 @@ exports.userProfileUpdate = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"User data updated successfully"
+    })
+})
+
+// Get All Users -- Admin
+exports.getAllUsers = catchAsyncErrors(async (req,res,next)=>{
+    const users = await User.find()
+
+    res.status(200).json({
+        status:true,
+        message:"All users get successfully",
+        data:users
+    })
+})
+
+// Get Single User
+exports.getSingleUser = catchAsyncErrors(async (req,res,next)=>{
+    const user = await User.findById(req.params.id)
+
+    if(!user){
+        return next(new ErrorHandler(`User does not exist with id : ${req.params.id}`,400))
+    }
+
+    res.status(200).json({
+        status:true,
+        message:"User Found successfully",
+        Data:user
+    })
+})
+
+
+// Update user role -- Admin
+exports.updateUserRole = catchAsyncErrors(async (req,res,next)=>{
+    const newUserData = {
+        name:req.body.name,
+        email:req.body.email,
+        role:req.body.role
+    }
+    
+    const user = await User.findByIdAndUpdate(req.params.id,newUserData,{
+        new:true,
+        runValidators:true,
+        useFindAndModify:false
+    })
+
+    res.status(200).json({
+        status:true,
+        message:"User role updated successfully"
+    })
+})
+
+
+// Delete User -- Admin
+exports.deleteUser = catchAsyncErrors(async (req,res,next)=>{
+ 
+    const user = User.findById(req.params.id)
+    // we will remove cloudinary later
+
+    if(!user){
+        next(new ErrorHandler(`User does not exist with id : ${req.params.id}`))
+    }
+    await user.remove()
+
+    res.status(200).json({
+        status:true,
+        message:`User deleted successfully`
+    })
+})
+
+// Create new review or update new review
+exports.createProductReview = catchAsyncErrors(async (req,res,next)=>{
+    
+    
+    const review = {
+        user:req.user._id,
+        name:req.user.name,
+        rating: Number(req.body.rating),
+        comment:req.body.comment
+    }
+    const product = await Product.findById(req.body.productId)
+
+    const isReviewed = product.reviews.find(rev=>rev.user.toString() == req.user._id.toString())
+
+    if(isReviewed){
+        product.reviews.forEach((rev)=>{
+            if(rev.user.toString()==req.user._id.toString()){
+                (rev.rating =req.body.rating),(rev.comment= req.body.comment)
+            }
+
+        })
+    }else{
+        product.reviews.push(review)
+        product.numOfReviews = product.reviews.length
+    }
+
+    let avg = 0;
+
+    product.ratings = product.reviews.forEach(rev=>{
+        avg+=rev.rating
+    })
+
+    product.ratings = avg/product.reviews.length;
+
+    await product.save({validateBeforeSave:false})
+
+    res.status(200).json({
+        success:true,
+        massege:"Rating updated successfully"
+    })
+
+})
+
+// Get all product reviews
+exports.getProductReviews = catchAsyncErrors(async (req,res,next)=>{
+    const product = await Product.findById(req.query.id);
+
+    if(!product){
+        return next(new ErrorHandler("Product Not Found",404))
+    }
+
+    res.status(200).json({
+        success:true,
+        message:"product review found",
+        data:product.reviews
+    })
+})
+
+// Delete Review
+exports.deleteReview = catchAsyncErrors(async (req,res,next)=>{
+    const product = await Product.findById(req.query.productId)
+    if(!product){
+        return next(new ErrorHandler("Product Not Found",404))
+    }
+
+    const reviews = product.reviews.filter(rev=>rev._id.toString() !== req.query.id.toString())
+    
+    let avg = 0;
+
+    product.ratings = product.reviews.forEach(rev=>{
+        avg+=rev.rating
+    })
+
+    const ratings = avg/reviews.length;
+
+    const numOfReviews = reviews.length
+
+    await Product.findByIdAndUpdate(req.query.productId,
+        {
+            reviews,
+            ratings,
+            numOfReviews
+        },
+        {
+            new:false,
+            runValidators:true,
+            useFindAndModify:false
+        })
+
+    res.status(200).json({
+        success:true,
+        massege:"Rating updated successfully"
     })
 })
