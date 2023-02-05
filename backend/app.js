@@ -4,7 +4,9 @@ const errorMiddleware = require("./middleware/error")
 const product = require("./routes/productRoute")
 const user = require("./routes/userRoute")
 const order = require("./routes/orderRoute")
+const cors = require('cors')
 
+// app.use(cors())
 app.use(express.json())
 
 // Route Imports
