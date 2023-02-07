@@ -10,7 +10,7 @@ const options = {
     isHalf:true
 }
 
-const Product = ({product}) => {
+const ProductCard = ({product}) => {
   return (
     <div>
         <Link className='productCard' to={`/product/${product._id}`}>
@@ -26,4 +26,4 @@ const Product = ({product}) => {
   )
 }
 
-export default Product
+export default ProductCard

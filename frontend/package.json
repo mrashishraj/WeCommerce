@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/lab": "^4.0.0-alpha.60",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.7",
     "@mui/styles": "^5.11.7",
@@ -25,6 +26,7 @@
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-thunk": "^2.3.0",
+    "swiper": "^9.0.3",
     "web-vitals": "^2.1.4",
     "webfontloader": "^1.6.28"
   },
@@ -52,5 +54,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy":"http://192.168.1.8:4000"
+  "proxy": "http://localhost:4000"
 }

@@ -16,8 +16,7 @@ const Footer = () => {
       </div>
 
       <div className="midFooter">
-        <img src={logo} alt="logo" />
-
+        <p>WeCommerce</p>
         <p>Copyrights 2021 &copy; Ashish Raj</p>
       </div>
 

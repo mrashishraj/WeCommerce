@@ -6,6 +6,9 @@ import {
     PRODUCT_DETAILS_REQUEST,
     PRODUCT_DETAILS_SUCCESS,
     PRODUCT_DETAILS_FAILED,
+    NEW_REVIEW_REQUESTED,
+    NEW_REVIEW_SUCCESS,
+    NEW_REVIEW_FAILED,
     CLEAR_ERRORS } from "../constants/productConstants";
 
 // Getting all product list
@@ -34,9 +37,8 @@ export const getProductDetails = (id) =>  async (dispatch)=>{
         const {data} = await axios.get(`/api/v1/product/${id}`)
         dispatch({
             type:PRODUCT_DETAILS_SUCCESS,
-            payload:data
+            payload:data.product
         })
-        
     } catch (error) {
         dispatch({
             type:PRODUCT_DETAILS_FAILED,
@@ -44,6 +46,33 @@ export const getProductDetails = (id) =>  async (dispatch)=>{
         })
     }
 }
+
+// NEW REVIEW
+export const newReview = (reviewData) => async (dispatch) => {
+    try {
+      dispatch({ type: NEW_REVIEW_REQUESTED });
+  
+      const config = {
+        headers: { "Content-Type": "application/json" },
+      };
+  
+      const { data } = await axios.put(`/api/v1/review`, reviewData, config);
+  
+      dispatch({
+        type: NEW_REVIEW_SUCCESS,
+        payload: data.success,
+      });
+    } catch (error) {
+      dispatch({
+        type: NEW_REVIEW_FAILED,
+        payload: error.response.data.message,
+      });
+    }
+  };
+
+
+
+
 
 // Clearing Errors
 export const clearErrors = () =>async (dispatch)=>{
