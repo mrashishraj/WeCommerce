@@ -9,17 +9,18 @@ import {
 
 
 export const productReducer = (state={products:[]},action)=>{
-        switch (action.type) {
-            case ALL_PRODUCT_REQUEST:
-                return{
-                    loading:true,
-                    product:[]
-                }
-                case ALL_PRODUCT_SUCCESS:
+    switch (action.type) {
+        case ALL_PRODUCT_REQUEST:
+            return{
+                loading:true,
+                product:[]
+            }
+            case ALL_PRODUCT_SUCCESS:
                     return{
                         loading:false,
                         products:action.payload.products,
-                        productCount:action.payload.productCount
+                        productsCount:action.payload.productsCount,
+                        resultPerPage:action.payload.resultPerPage
                     }
             case ALL_PRODUCT_FAILED:
                 return{
