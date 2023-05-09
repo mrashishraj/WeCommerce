@@ -32,7 +32,7 @@ exports.newOrder = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         success:true,
         message:"Order created successfully",
-        data:order
+        order
     })
 })
 
@@ -48,7 +48,7 @@ exports.getSingleOrderDetails = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"order found successfully",
-        data:order
+        order
     })
 })
 
@@ -60,7 +60,7 @@ exports.getMyOrderList = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"Order list found successfully",
-        data:order
+        order
     })
 })
 
@@ -76,7 +76,8 @@ exports.getAllOrders = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"Order List Found Successfully",
-        data:{totalAmount,order}
+        totalAmount,
+        order
     })
 })
 
@@ -105,7 +106,7 @@ exports.updateOrderStatus = catchAsyncErrors(async (req,res,next)=>{
     await order.save({validateBeforeSave:false})
     res.status(200).json({
         success:true,
-        data:order
+        order
     })
 })
 

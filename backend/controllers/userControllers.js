@@ -6,19 +6,29 @@ const sendEmail = require("../utils/sendEmail")
 const crypto = require("crypto")
 const Product = require("../models/productModels")
 const { query } = require("express")
+const cloudinary = require("cloudinary")
+
 
 exports.registerUser = catchAsyncErrors(async (req, res, next)=>{
-    const {name, email, password} = req.body
 
+    const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar,{
+        folder:"avatars",
+        width:150,
+        crop:"scale"
+    })
+    // console.log("anurag")
+
+const {name, email, password} = req.body
     const user = await User.create({
         name,
         email,
         password,
         avatar:{
-            public_id:"this is a sample id",
-            url:"profilePicUrl.com/test"
+            public_id:myCloud.public_id,
+            url:myCloud.secure_url,
         }
     })
+    // console.log("anurag222")
 
     sendToken(user,201,res)
 
@@ -134,7 +144,6 @@ exports.resetPassword = catchAsyncErrors(async (req,res,next)=>{
 
 exports.getUserDetails = catchAsyncErrors(async (req,res,next)=>{
     const user = await User.findById(req.user.id)
-
     sendToken(user,200,res)
 })
 
@@ -193,7 +202,7 @@ exports.getAllUsers = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"All users get successfully",
-        data:users
+        users
     })
 })
 
@@ -208,7 +217,7 @@ exports.getSingleUser = catchAsyncErrors(async (req,res,next)=>{
     res.status(200).json({
         status:true,
         message:"User Found successfully",
-        Data:user
+        user
     })
 })
 

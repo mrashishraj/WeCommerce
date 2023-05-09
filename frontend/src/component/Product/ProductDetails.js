@@ -4,7 +4,8 @@ import "./ProductDeatails.css";
 import { useSelector,useDispatch } from 'react-redux';
 import Loader from '../layout/Loader/Loader';
 import { Rating } from "@material-ui/lab";
-import { addItemsToCart } from "../../redux/actions/cartAction";
+// import { addItemsToCart } from "../../redux/actions/cartActions";
+import { addItemsToCart } from '../../redux/actions/cartActions';
 import ReactStars from "react-rating-stars-component"
 import {
   Dialog,

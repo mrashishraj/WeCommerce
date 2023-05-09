@@ -15,7 +15,7 @@ module.exports = (err,req,res,next)=>{
     // Mongoose Duplicate Key Error
     if(err.code === 11000){
         const message = `Duplicate ${Object.keys(err.keyValue)} Entered`
-        err = next(ErrorHandler(message,400))
+        err = next(new ErrorHandler(message,400))
     }
 
     // Wrong JWT error
