@@ -1,12 +1,17 @@
-import React,{Fragment, useEffect,useState} from 'react';
-import Carousel from 'react-material-ui-carousel'
-import "./ProductDeatails.css";
-import { useSelector,useDispatch } from 'react-redux';
-import Loader from '../layout/Loader/Loader';
-import { Rating } from "@material-ui/lab";
-// import { addItemsToCart } from "../../redux/actions/cartActions";
-import { addItemsToCart } from '../../redux/actions/cartActions';
-import ReactStars from "react-rating-stars-component"
+import React, { Fragment, useEffect, useState } from "react";
+import Carousel from "react-material-ui-carousel";
+import "./ProductDetails.css";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  clearErrors,
+  getProductDetails,
+  newReview,
+} from "../../actions/productAction";
+import ReviewCard from "./ReviewCard.js";
+import Loader from "../layout/Loader/Loader";
+import { useAlert } from "react-alert";
+import MetaData from "../layout/MetaData";
+import { addItemsToCart } from "../../actions/cartAction";
 import {
   Dialog,
   DialogActions,
@@ -14,90 +19,106 @@ import {
   DialogTitle,
   Button,
 } from "@material-ui/core";
-import {
-  clearErrors,
-  getProductDetails,
-  newReview,
-} from "../../redux/actions/productActions";
-import ReviewCard from "./ReviewCard.js";
-import {useAlert} from "react-alert"
+import { Rating } from "@material-ui/lab";
+import { NEW_REVIEW_RESET } from "../../constants/productConstants";
 
-const ProductDetails = ({match}) => {
-    const dispatch = useDispatch()
-    const [quantity, setQuantity] = useState(1);
-    const [open, setOpen] = useState(false);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const alert = useAlert()
-    const {product,loading,error} = useSelector(state=>state.productDetails)
+const ProductDetails = ({ match }) => {
+  const dispatch = useDispatch();
+  const alert = useAlert();
 
-    useEffect(()=>{
-      if(error){ 
-      alert.error(error)
-      dispatch(clearErrors())}
+  const { product, loading, error } = useSelector(
+    (state) => state.productDetails
+  );
 
-      dispatch(getProductDetails(match.params.id))
-    },[dispatch,match.params.id,error,alert])
+  const { success, error: reviewError } = useSelector(
+    (state) => state.newReview
+  );
 
-    if(product.images){
-      console.log(product.images);
-    }else{
-      console.log('product not found');
-    }
-    const options = {
-        size: window.innerWidth<600?10:15,
-        readOnly: true,
-        precision: 0.5,
-        value:product.ratings
-      };
+  const options = {
+    size: "large",
+    value: product.ratings,
+    readOnly: true,
+    precision: 0.5,
+  };
 
-    const decreaseQuantity = () => {
-    if (1 >= quantity) return;
+  const [quantity, setQuantity] = useState(1);
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
 
-    const qty = quantity - 1;
-    setQuantity(qty);
-    };
-
-    const increaseQuantity = () => {
+  const increaseQuantity = () => {
     if (product.Stock <= quantity) return;
 
     const qty = quantity + 1;
     setQuantity(qty);
-    };
+  };
 
-    const addToCartHandler = () => {
+  const decreaseQuantity = () => {
+    if (1 >= quantity) return;
+
+    const qty = quantity - 1;
+    setQuantity(qty);
+  };
+
+  const addToCartHandler = () => {
     dispatch(addItemsToCart(match.params.id, quantity));
     alert.success("Item Added To Cart");
-    };
+  };
 
-    const submitReviewToggle = () => {
+  const submitReviewToggle = () => {
     open ? setOpen(false) : setOpen(true);
-      };
+  };
 
-    const reviewSubmitHandler = () => {
-      const myForm = new FormData();
-  
-      myForm.set("rating", rating);
-      myForm.set("comment", comment);
-      myForm.set("productId", match.params.id);
-  
-      dispatch(newReview(myForm));
-  
-      setOpen(false);
-    };
+  const reviewSubmitHandler = () => {
+    const myForm = new FormData();
 
+    myForm.set("rating", rating);
+    myForm.set("comment", comment);
+    myForm.set("productId", match.params.id);
+
+    dispatch(newReview(myForm));
+
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    if (error) {
+      alert.error(error);
+      dispatch(clearErrors());
+    }
+
+    if (reviewError) {
+      alert.error(reviewError);
+      dispatch(clearErrors());
+    }
+
+    if (success) {
+      alert.success("Review Submitted Successfully");
+      dispatch({ type: NEW_REVIEW_RESET });
+    }
+    dispatch(getProductDetails(match.params.id));
+  }, [dispatch, match.params.id, error, alert, reviewError, success]);
 
   return (
     <Fragment>
-        {loading?(<Loader/>):
-        (<Fragment>
-        <div className="ProductDetails">
+      {loading ? (
+        <Loader />
+      ) : (
+        <Fragment>
+          <MetaData title={`${product.name} -- ECOMMERCE`} />
+          <div className="ProductDetails">
             <div>
-                <Carousel>
-                    {product.images && product.images.map((item,i)=>                    
-                    <img src={item.url} alt={`${i} Slide`} key={item.url} className="CarouselImage"/>
-                    )}
-                </Carousel>
+              <Carousel>
+                {product.images &&
+                  product.images.map((item, i) => (
+                    <img
+                      className="CarouselImage"
+                      key={i}
+                      src={item.url}
+                      alt={`${i} Slide`}
+                    />
+                  ))}
+              </Carousel>
             </div>
 
             <div>
@@ -106,9 +127,7 @@ const ProductDetails = ({match}) => {
                 <p>Product # {product._id}</p>
               </div>
               <div className="detailsBlock-2">
-                {/* <Rating {...options} value={product.ratings}/> */}
-                <ReactStars value={product.ratings} {...options} />
-
+                <Rating {...options} />
                 <span className="detailsBlock-2-span">
                   {" "}
                   ({product.numOfReviews} Reviews)
@@ -118,11 +137,14 @@ const ProductDetails = ({match}) => {
                 <h1>{`₹${product.price}`}</h1>
                 <div className="detailsBlock-3-1">
                   <div className="detailsBlock-3-1-1">
-                    <button>-</button>
-                    <input readOnly type="number"  />
-                    <button>+</button>
+                    <button onClick={decreaseQuantity}>-</button>
+                    <input readOnly type="number" value={quantity} />
+                    <button onClick={increaseQuantity}>+</button>
                   </div>
-                  <button>
+                  <button
+                    disabled={product.Stock < 1 ? true : false}
+                    onClick={addToCartHandler}
+                  >
                     Add to Cart
                   </button>
                 </div>
@@ -139,61 +161,59 @@ const ProductDetails = ({match}) => {
                 Description : <p>{product.description}</p>
               </div>
 
-              <button  className="submitReview">
+              <button onClick={submitReviewToggle} className="submitReview">
                 Submit Review
               </button>
             </div>
-        </div>
-        
-        <h3 className="reviewsHeading">REVIEWS</h3>
+          </div>
 
-<Dialog
-  aria-labelledby="simple-dialog-title"
-  open={open}
-  onClose={submitReviewToggle}
->
-  <DialogTitle>Submit Review</DialogTitle>
-  <DialogContent className="submitDialog">
-    <Rating
-      onChange={(e) => setRating(e.target.value)}
-      value={rating}
-      size="large"
-    />
+          <h3 className="reviewsHeading">REVIEWS</h3>
 
-    <textarea
-      className="submitDialogTextArea"
-      cols="30"
-      rows="5"
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-    ></textarea>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={submitReviewToggle} color="secondary">
-      Cancel
-    </Button>
-    <Button onClick={reviewSubmitHandler} color="primary">
-      Submit
-    </Button>
-  </DialogActions>
-</Dialog>
+          <Dialog
+            aria-labelledby="simple-dialog-title"
+            open={open}
+            onClose={submitReviewToggle}
+          >
+            <DialogTitle>Submit Review</DialogTitle>
+            <DialogContent className="submitDialog">
+              <Rating
+                onChange={(e) => setRating(e.target.value)}
+                value={rating}
+                size="large"
+              />
 
-{product.reviews && product.reviews[0] ? (
-  <div className="reviews">
-    {product.reviews &&
-      product.reviews.map((review) => (
-        <ReviewCard key={review._id} review={review} />
-      ))}
-  </div>
-) : (
-  <p className="noReviews">No Reviews Yet</p>
-)}
+              <textarea
+                className="submitDialogTextArea"
+                cols="30"
+                rows="5"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              ></textarea>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={submitReviewToggle} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={reviewSubmitHandler} color="primary">
+                Submit
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {product.reviews && product.reviews[0] ? (
+            <div className="reviews">
+              {product.reviews &&
+                product.reviews.map((review) => (
+                  <ReviewCard key={review._id} review={review} />
+                ))}
+            </div>
+          ) : (
+            <p className="noReviews">No Reviews Yet</p>
+          )}
         </Fragment>
-        )}
-
-
+      )}
     </Fragment>
-  )
-}
+  );
+};
 
-export default ProductDetails
+export default ProductDetails;

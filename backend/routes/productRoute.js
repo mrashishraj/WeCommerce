@@ -1,28 +1,41 @@
 const express = require("express");
-const { 
-    getAllProducts,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    getProductDetails } = require("../controllers/productController");
-const { createProductReview, getProductReviews, deleteReview } = require("../controllers/userControllers");
-const { isAuthenticatedUser ,isAuthorisedRole} = require("../middleware/auth");
+const {
+  getAllProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductDetails,
+  createProductReview,
+  getProductReviews,
+  deleteReview,
+  getAdminProducts,
+} = require("../controllers/productController");
+const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
 
-router.route("/products").get(getAllProducts)
-
-router.route("/admin/product/new").post(isAuthenticatedUser,isAuthorisedRole("admin"),isAuthenticatedUser,createProduct)
+router.route("/products").get(getAllProducts);
 
 router
-.route("/admin/product/:id")
-.put(isAuthenticatedUser,isAuthorisedRole("admin"),isAuthenticatedUser,updateProduct)
-.delete(isAuthenticatedUser,isAuthorisedRole("admin"),isAuthenticatedUser,deleteProduct)
+  .route("/admin/products")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), getAdminProducts);
 
-router.route("/product/:id").get(getProductDetails)
+router
+  .route("/admin/product/new")
+  .post(isAuthenticatedUser, authorizeRoles("admin"), createProduct);
 
-router.route("/review").put(isAuthenticatedUser,createProductReview)
+router
+  .route("/admin/product/:id")
+  .put(isAuthenticatedUser, authorizeRoles("admin"), updateProduct)
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
 
-router.route("/reviews").get(getProductReviews).delete(isAuthenticatedUser,deleteReview)
+router.route("/product/:id").get(getProductDetails);
 
-module.exports = router
+router.route("/review").put(isAuthenticatedUser, createProductReview);
+
+router
+  .route("/reviews")
+  .get(getProductReviews)
+  .delete(isAuthenticatedUser, deleteReview);
+
+module.exports = router;

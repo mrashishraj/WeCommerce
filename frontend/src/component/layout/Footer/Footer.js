@@ -1,8 +1,6 @@
 import React from "react";
 import playStore from "../../../images/playstore.png";
 import appStore from "../../../images/Appstore.png";
-import logo from "../../../images/WeCommerce-logo-rgb.png";
-
 import "./Footer.css";
 
 const Footer = () => {
@@ -16,8 +14,10 @@ const Footer = () => {
       </div>
 
       <div className="midFooter">
-        <p>WeCommerce</p>
-        <p>Copyrights 2021 &copy; Ashish Raj</p>
+        <h1>ECOMMERCE.</h1>
+        <p>High Quality is our first priority</p>
+
+        <p>Copyrights 2021 &copy; MeAbhiSingh</p>
       </div>
 
       <div className="rightFooter">
