@@ -1,42 +1,56 @@
-import React from "react";
-import { ReactNavbar } from "overlay-navbar";
-import logo from "../../../images/logo.png";
+import React,{ useState } from "react";
+import { LOGO } from "../../../utils/constants"
+import { Link } from "react-router-dom"
+import useOnlineStatus from "../../../utils/onlineStatus"
+import { useSelector,useDispatch } from "react-redux"
+import { logout } from "../../../actions/userAction";
 
-const options = {
-  burgerColorHover: "#eb4034",
-  logo,
-  logoWidth: "20vmax",
-  navColor1: "white",
-  logoHoverSize: "10px",
-  logoHoverColor: "#eb4034",
-  link1Text: "Home",
-  link2Text: "Products",
-  link3Text: "Contact",
-  link4Text: "About",
-  link1Url: "/",
-  link2Url: "/products",
-  link3Url: "/contact",
-  link4Url: "/about",
-  link1Size: "1.3vmax",
-  link1Color: "rgba(35, 35, 35,0.8)",
-  nav1justifyContent: "flex-end",
-  nav2justifyContent: "flex-end",
-  nav3justifyContent: "flex-start",
-  nav4justifyContent: "flex-start",
-  link1ColorHover: "#eb4034",
-  link1Margin: "1vmax",
-  profileIconUrl: "/login",
-  profileIconColor: "rgba(35, 35, 35,0.8)",
-  searchIconColor: "rgba(35, 35, 35,0.8)",
-  cartIconColor: "rgba(35, 35, 35,0.8)",
-  profileIconColorHover: "#eb4034",
-  searchIconColorHover: "#eb4034",
-  cartIconColorHover: "#eb4034",
-  cartIconMargin: "1vmax",
-};
 
-const Header = () => {
-  return <ReactNavbar {...options} />;
+
+
+const Header = ({history,location}) => {
+  const dispatch = useDispatch()
+  const {user} = useSelector((state) => state.user);
+  const {cartItems} = useSelector((state) => state.cart);
+
+  console.log(cartItems);
+  // console.log(history);
+  // const redirectToLogin = location.search ? location.search.split("=")[1] : "/login";
+  // const redirectToLogout = location.search ? location.search.split("=")[1] : "/products";
+
+console.log(location);
+  const handleLogout = (user) => {
+    // console.log(user.target.name);
+
+    if(user){
+      dispatch(logout())
+      alert.success("Logout Successfully");
+      history.push(["/logout"]);
+    }
+    
+  }
+  
+  return(
+    <div className="flex justify-between shadow-xlg">
+           <Link to="/"> 
+              <div className="logoBox mt-3 ml-4">
+                <img className="w-32" src={LOGO} alt="logo" />
+              </div>
+            </Link>
+            <div className={`flex items-center ${user?"mr-16":"mr-0"}`}>
+                <ul className="flex p-4 mx-6">
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100">Online Status : {useOnlineStatus?"✅":"⛔️"} </li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100"><Link to="/"> Home</Link></li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100"><Link to="/products"> Products</Link></li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100"><Link to="/about"> About</Link></li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100"><Link to="/contact">Contect Us</Link> </li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100"><Link to="/cart"> Cart ({cartItems.length})</Link></li>
+                    <li className="p-2 mx-3 shadow-md rounded-md bg-blue-100">{user?(<button name="Logout" onClick={handleLogout}>Logout</button>):(<Link to="/login"><button>Login</button></Link>)}</li>
+                </ul>
+            </div>
+        </div>
+
+  );
 };
 
 export default Header;

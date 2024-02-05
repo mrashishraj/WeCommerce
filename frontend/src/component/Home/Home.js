@@ -27,7 +27,7 @@ const Home = () => {
         <Loader />
       ) : (
         <Fragment>
-          <MetaData title="ECOMMERCE" />
+          {/* <MetaData title="ECOMMERCE" />
 
           <div className="banner">
             <p>Welcome to Ecommerce</p>
@@ -38,7 +38,7 @@ const Home = () => {
                 Scroll <CgMouse />
               </button>
             </a>
-          </div>
+          </div> */}
 
           <h2 className="homeHeading">Featured Products</h2>
 

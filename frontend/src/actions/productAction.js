@@ -53,7 +53,7 @@ export const getProduct =
     } catch (error) {
       dispatch({
         type: ALL_PRODUCT_FAIL,
-        payload: error.response.data.message,
+        payload: error?.response?.data?.message,
       });
     }
   };
@@ -81,11 +81,9 @@ export const getAdminProduct = () => async (dispatch) => {
 export const createProduct = (productData) => async (dispatch) => {
   try {
     dispatch({ type: NEW_PRODUCT_REQUEST });
-
     const config = {
       headers: { "Content-Type": "application/json" },
     };
-
     const { data } = await axios.post(
       `/api/v1/admin/product/new`,
       productData,

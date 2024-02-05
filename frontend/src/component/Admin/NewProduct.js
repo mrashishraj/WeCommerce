@@ -48,23 +48,26 @@ const NewProduct = ({ history }) => {
       history.push("/admin/dashboard");
       dispatch({ type: NEW_PRODUCT_RESET });
     }
-  }, [dispatch, alert, error, history, success]);
+    }, [dispatch, alert, error, history, success]);
 
   const createProductSubmitHandler = (e) => {
     e.preventDefault();
 
-    const myForm = new FormData();
+    const form = new FormData();
 
-    myForm.set("name", name);
-    myForm.set("price", price);
-    myForm.set("description", description);
-    myForm.set("category", category);
-    myForm.set("Stock", Stock);
+    form.set("name", name);
+    form.set("price", price);
+    form.set("description", description);
+    form.set("category", category);
+    form.set("Stock", Stock);
 
     images.forEach((image) => {
-      myForm.append("images", image);
+      form.append("images", image);
     });
-    dispatch(createProduct(myForm));
+
+    console.log(form.getAll("images"))
+
+    dispatch(createProduct(form));
   };
 
   const createProductImagesChange = (e) => {
